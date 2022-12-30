@@ -5,6 +5,7 @@ import com.example.spotify.DTO.ArtistDTO;
 import com.example.spotify.DTO.SongDTO;
 import com.example.spotify.entities.Artist;
 import com.example.spotify.entities.Song;
+import com.example.spotify.enums.Genre;
 import com.example.spotify.exceptions.ArtistBadRequestException;
 import com.example.spotify.exceptions.ArtistNotFoundException;
 import com.example.spotify.exceptions.SongBadRequestException;
@@ -40,6 +41,40 @@ public class SongService implements ISongService {
     public List<SongDTO> findAll() {
         List<Song> songs=songRepository.findAll();
         List<SongDTO> songsDTO= new ArrayList<>();
+        for(Song song : songs){
+            songsDTO.add(convertToDTO(song));
+        }
+        return songsDTO;
+    }
+    public List<SongDTO> findAllByTitle(String title,String matching){
+        List<SongDTO> songsDTO=new ArrayList<>();
+
+        if(matching==null){
+            List<Song> songs = songRepository.findByNameContains(title);
+            for(Song song : songs){
+                songsDTO.add(convertToDTO(song));
+            }
+        }
+        else if (matching.equals("exact")) {
+            List<Song> songs=songRepository.findByName(title);
+            for(Song song : songs){
+                songsDTO.add(convertToDTO(song));
+            }
+        }
+
+        return songsDTO;
+    }
+    public List<SongDTO> findAllByGenre(Genre gen){
+        List<SongDTO> songsDTO=new ArrayList<>();
+        List<Song> songs = songRepository.findByGen(gen);
+        for(Song song : songs){
+            songsDTO.add(convertToDTO(song));
+        }
+        return songsDTO;
+    }
+    public List<SongDTO> findAllByYear(int year){
+        List<SongDTO> songsDTO=new ArrayList<>();
+        List<Song> songs = songRepository.findByYear(year);
         for(Song song : songs){
             songsDTO.add(convertToDTO(song));
         }

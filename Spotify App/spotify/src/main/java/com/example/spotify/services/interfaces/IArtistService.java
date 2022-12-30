@@ -11,6 +11,7 @@ import java.util.Set;
 public interface IArtistService {
 
     List<ArtistDTO> findAll();
+    List<ArtistDTO> findAllByName(String name,String matching);
     ArtistDTO findById(String uuid);
     void deleteById(String uuid);
     ArtistDTO insert(ArtistDTO newArtist);

@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.BasicLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -27,15 +29,70 @@ public class ArtistController {
     private IArtistService artistService;
 
     @GetMapping("/artists")
-    public ResponseEntity<?> all(){
-        List<EntityModel<ArtistDTO>> artists=artistService.findAll().stream()
-                .map(artist->EntityModel.of(artist,
-                        linkTo(methodOn(ArtistController.class).one(artist.getUuid())).withSelfRel(),
-                        linkTo(methodOn(ArtistController.class).all()).withRel("artists"),
-                        linkTo(methodOn(ArtistController.class).getAllFromArtist(artist.getUuid())).withRel("songs")
-                        )).collect(Collectors.toList());
+    public ResponseEntity<?> all(@RequestParam(required = false,name="name") String name,
+                                 @RequestParam(required = false,name="matching") String matching,
+                                 @RequestParam(required = false,name="page") Integer page,
+                                 @RequestParam(required = false,name="items_per_page") Integer itemsPerPage) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(CollectionModel.of(artists, linkTo(methodOn(ArtistController.class).all()).withSelfRel()));
+        if(!StringUtils.isEmpty(page)){
+
+            if(StringUtils.isEmpty(itemsPerPage)){
+                itemsPerPage=3;
+            }
+            List<ArtistDTO> artists = artistService.findAll();
+            if(page<=0) {
+                return  new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
+            List<ArtistDTO> fitArtists= new ArrayList<>();
+            for(int i=itemsPerPage*(page-1);i<itemsPerPage*page;i++){
+
+                fitArtists.add(artists.get(i));
+            }
+            List<EntityModel<ArtistDTO>> newArtists=fitArtists.stream()
+                    .map(artist -> EntityModel.of(artist,
+                            linkTo(methodOn(ArtistController.class).one(artist.getUuid())).withSelfRel(),
+                            BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection").slash("artists").withRel("artists"),
+                            linkTo(methodOn(ArtistController.class).getAllFromArtist(artist.getUuid())).withRel("songs")
+
+                    )).collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.OK).body(CollectionModel.of(newArtists, BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection").slash("artists").withSelfRel(),
+                    BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection").slash("artists?page="+(page+1)+"&items_per_page="+itemsPerPage).withRel("next"),
+                    BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection").slash("artists?page="+(page-1)+"&items_per_page="+itemsPerPage).withRel("prev")));
+
+        }
+        else {
+            if (!StringUtils.isEmpty(name)) {
+
+                if (StringUtils.isEmpty(matching)) {
+                    List<EntityModel<ArtistDTO>> artists = artistService.findAllByName(name, matching).stream()
+                            .map(artist -> EntityModel.of(artist,
+                                    linkTo(methodOn(ArtistController.class).one(artist.getUuid())).withSelfRel(),
+                                    BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection/artists").withRel("artists"),
+                                    linkTo(methodOn(ArtistController.class).getAllFromArtist(artist.getUuid())).withRel("songs")
+                            )).collect(Collectors.toList());
+
+                    return ResponseEntity.status(HttpStatus.OK).body(CollectionModel.of(artists, BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection/artists").slash("?name=" + name.replace(" ", "%20")).withSelfRel()));
+                } else {
+                    List<EntityModel<ArtistDTO>> artists = artistService.findAllByName(name, matching).stream()
+                            .map(artist -> EntityModel.of(artist,
+                                    linkTo(methodOn(ArtistController.class).one(artist.getUuid())).withSelfRel(),
+                                    BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection/artists").withRel("artists"),
+                                    linkTo(methodOn(ArtistController.class).getAllFromArtist(artist.getUuid())).withRel("songs")
+                            )).collect(Collectors.toList());
+
+                    return ResponseEntity.status(HttpStatus.OK).body(CollectionModel.of(artists, BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection/artists").slash("?name=" + name.replace(" ", "%20") + "&matching=" + matching.replace(" ", "%20")).withSelfRel()));
+                }
+            } else {
+                List<EntityModel<ArtistDTO>> artists = artistService.findAll().stream()
+                        .map(artist -> EntityModel.of(artist,
+                                linkTo(methodOn(ArtistController.class).one(artist.getUuid())).withSelfRel(),
+                                BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection/artists").withRel("artists"),
+                                linkTo(methodOn(ArtistController.class).getAllFromArtist(artist.getUuid())).withRel("songs")
+                        )).collect(Collectors.toList());
+                return ResponseEntity.status(HttpStatus.OK).body(CollectionModel.of(artists, BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection").slash("artists").withSelfRel()));
+            }
+        }
     }
 
     @GetMapping("/artists/{uuid}")
@@ -43,7 +100,7 @@ public class ArtistController {
         ArtistDTO artist=artistService.findById(uuid);
         return ResponseEntity.status((HttpStatus.OK)).body(EntityModel.of(artist,
                 linkTo(methodOn(ArtistController.class).one(uuid)).withSelfRel(),
-                linkTo(methodOn(ArtistController.class).all()).withRel("artists"),
+                BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection/artists").withRel("artists"),
                 linkTo(methodOn(ArtistController.class).getAllFromArtist(artist.getUuid())).withRel("songs")));
     }
 
@@ -51,7 +108,7 @@ public class ArtistController {
     ResponseEntity<?> deleteArtist(@PathVariable String uuid){
         ArtistDTO artist = artistService.findById(uuid);
         ResponseEntity<EntityModel<ArtistDTO>> response=ResponseEntity.status((HttpStatus.OK)).body(EntityModel.of(artist,
-                linkTo(methodOn(ArtistController.class).all()).withRel("artists")
+                BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection/artists").withRel("artists")
 
         ));
         artistService.deleteById(uuid);
@@ -72,7 +129,7 @@ public class ArtistController {
         }
         return new ResponseEntity<>(EntityModel.of(artist,
                 linkTo(methodOn(ArtistController.class).one(artist.getUuid())).withSelfRel(),
-                linkTo(methodOn(ArtistController.class).all()).withRel("artists")
+                BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection/artists").withRel("artists")
         ),HttpStatus.CREATED);
     }
 
@@ -124,12 +181,12 @@ public class ArtistController {
         List<EntityModel<SongDTO>> songs=artistService.getAllSongsByArtist(uuid).stream()
                 .map(song->EntityModel.of(song,
                         linkTo(methodOn(SongController.class).one(song.getId())).withSelfRel(),
-                        linkTo(methodOn(SongController.class).all()).withRel("songs"),
+                        BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection").slash("songs").withRel("songs"),
                         linkTo(methodOn(ArtistController.class).one(uuid)).withRel("artist"))
                 )
                     .collect(Collectors.toList());
 
-        return new ResponseEntity<>(CollectionModel.of(songs, linkTo(methodOn(SongController.class).all()).withSelfRel()),HttpStatus.OK);
+        return new ResponseEntity<>(CollectionModel.of(songs,  BasicLinkBuilder.linkToCurrentMapping().slash("/api/songcollection").slash("songs").withRel("songs")),HttpStatus.OK);
 
     }
     //To assign an existent song to an artist

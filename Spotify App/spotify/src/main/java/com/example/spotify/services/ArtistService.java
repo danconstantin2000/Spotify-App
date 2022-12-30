@@ -39,6 +39,25 @@ public class ArtistService implements IArtistService {
         }
         return artistsDTO;
     }
+
+    @Override
+    public List<ArtistDTO> findAllByName(String name,String matching){
+        List<ArtistDTO> artistDTO=new ArrayList<>();
+
+        if(matching==null){
+            List<Artist> artists = artistRepository.findByNameContains(name);
+            for(Artist artist : artists){
+                artistDTO.add(convertToDTO(artist));
+            }
+        }
+        else if (matching.equals("exact")) {
+            List<Artist> artists=artistRepository.findByName(name);
+            for(Artist artist : artists){
+                artistDTO.add(convertToDTO(artist));
+            }
+        }
+        return artistDTO;
+    }
     @Override
     public ArtistDTO findById(String uuid){
         Artist artist = artistRepository.findById(uuid).orElseThrow(() -> new ArtistNotFoundException(uuid));
