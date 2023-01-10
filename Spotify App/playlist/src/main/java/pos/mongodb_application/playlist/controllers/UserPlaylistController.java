@@ -35,4 +35,47 @@ public class UserPlaylistController {
         return new ResponseEntity<>(userPlaylist, HttpStatus.CREATED);
 
     }
+
+    @GetMapping("/userPlaylist/{userPlaylistId}")
+    public ResponseEntity<?> getUserPlaylistById(@PathVariable String userPlaylistId){
+        UserPlaylist userPlaylist = userPlaylistService.findById(userPlaylistId);
+        if(userPlaylist==null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(userPlaylist,HttpStatus.OK);
+    }
+    @GetMapping("/userPlaylist/user/{uid}")
+    public ResponseEntity<?> getUserPlaylistByUid(@PathVariable int uid){
+        UserPlaylist userPlaylist = userPlaylistService.findByUid(uid);
+        if(userPlaylist==null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(userPlaylist,HttpStatus.OK);
+    }
+    @PutMapping("/userPlaylist/{userPlaylistId}/playlist/{playlistId}/songs/{songId}")
+    public  ResponseEntity<?> addSongToPlaylist(@PathVariable String userPlaylistId, @PathVariable String playlistId, @PathVariable int songId ){
+
+        UserPlaylist userPlaylist=userPlaylistService.putSongToPlaylist(userPlaylistId,playlistId,songId);
+        if(userPlaylist==null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(userPlaylist,HttpStatus.OK);
+
+    }
+
+    @DeleteMapping("/userPlaylist/{userPlaylistId}/playlist/{playlistId}/songs/{songId}")
+    public  ResponseEntity<?> deleteSongForPlaylist(@PathVariable String userPlaylistId, @PathVariable String playlistId, @PathVariable int songId ) {
+        UserPlaylist userPlaylist=userPlaylistService.deleteSongFromPlaylist(userPlaylistId,playlistId,songId);
+        if(userPlaylist==null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(userPlaylist,HttpStatus.OK);
+    }
+
+    @DeleteMapping("userPlaylist/{userPlaylistId}/playlist/{playlistId}")
+
+    public  ResponseEntity<?> deletePlaylist(@PathVariable String userPlaylistId, @PathVariable String playlistId) {
+        UserPlaylist userPlaylist=userPlaylistService.deletePlaylist(userPlaylistId,playlistId);
+        if(userPlaylist==null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(userPlaylist,HttpStatus.OK);
+    }
+
 }
