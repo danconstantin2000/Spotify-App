@@ -1,6 +1,32 @@
 from models.user_orm import User
 from base.sql_base import Session
+import jwt
+import datetime
+def generate_token(uid, role):
+    try:
+        payload = {
+            # iss
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+            'sub': uid,
+            'jti': uid,
+            'role': role
+        }
+        return jwt.encode(
+            payload,
+            "secret",
+            algorithm='HS256'
+        )
+    except Exception as e:
+        return e
 
+def decode_jwt_token(jwt_token):
+    try:
+        payload = jwt.decode(jwt_token, "secret", algorithms='HS256')
+        return payload['sub'], payload['role']
+    except jwt.ExpiredSignatureError:
+        return -1, "expired"
+    except jwt.InvalidTokenError:
+        return -2, "invalid"
 
 def get_users():
     session = Session()
@@ -46,6 +72,10 @@ def delete_user(UID):
 def check_registered_user(username,password):
     session=Session()
     user=session.query(User).filter(User.username==username).filter(User.password==password).first()
+    roles=[]
     if user:
-        return True
-    return False
+        for role in user.roles:
+            roles.append(role.RID)
+        jwt_token=generate_token(user.UID,roles)
+        return jwt_token
+    return str({"mesaj":"user not found."})

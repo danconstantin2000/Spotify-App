@@ -28,12 +28,22 @@ public class ArtistController {
     @Autowired
     private IArtistService artistService;
 
+
     @GetMapping("/artists")
     public ResponseEntity<?> all(@RequestParam(required = false,name="name") String name,
                                  @RequestParam(required = false,name="matching") String matching,
                                  @RequestParam(required = false,name="page") Integer page,
-                                 @RequestParam(required = false,name="items_per_page") Integer itemsPerPage) {
+                                 @RequestParam(required = false,name="items_per_page") Integer itemsPerPage,
+                                 @RequestHeader(required = false,name="Authorization") String authorization)
+    {
+        if(authorization==null || !authorization.contains("Bearer ")
+        {
 
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+
+        System.out.println(authorization);
         if(!StringUtils.isEmpty(page)){
 
             if(StringUtils.isEmpty(itemsPerPage)){
