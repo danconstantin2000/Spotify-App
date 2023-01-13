@@ -43,11 +43,17 @@ class ComplexModelUser(ComplexModel):
 class IDMService(ServiceBase):
     @rpc(String, String, _returns=Boolean)
     def add_user(ctx, username, password):
+
         print("Creating user:")
         hashed_password=hashlib.sha256(str.encode(password))
         hashed_password_hex=hashed_password.hexdigest()
         new_user = create_user(username, hashed_password_hex)
         if new_user:
+            users_roles = assign_role(new_user.UID, 3)
+            if users_roles:
+                return True
+            else:
+                return False
             return True
         else:
             return False
@@ -71,7 +77,8 @@ class IDMService(ServiceBase):
             return False
         user_json = json.loads(output)
         roles = user_json["roles"]
-        # if admin
+        # if CONTENT_MANAGER/CLIENT <-ADMIN
+
         if 4 in roles:
             users_roles=assign_role(UID,RID)
             if users_roles:
@@ -79,6 +86,9 @@ class IDMService(ServiceBase):
             else:
                 return False
         return False
+
+
+
     @rpc(Integer,String, _returns=Boolean)
     def delete_user_service(ctx,UID,jwt_token):
         output = IDMService.authorize(ctx, jwt_token)

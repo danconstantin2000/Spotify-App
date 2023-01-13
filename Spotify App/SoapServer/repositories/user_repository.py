@@ -40,6 +40,7 @@ def get_user(UID):
     
 def create_user(username, password):
     session = Session()
+    session.expire_on_commit = False
     user = User(username, password)
     try:
         session.add(user)
