@@ -201,4 +201,27 @@ public class UserPlaylistService implements IUserPlaylistService {
         userPlaylistCollectionRepository.save(userPlaylist);
         return userPlaylist;
     }
+    public Playlist getPlaylist(String userPlaylistId, String playlistId){
+
+        Optional<UserPlaylist> optionalUserPlaylist= userPlaylistCollectionRepository.findById(userPlaylistId);
+        if(optionalUserPlaylist.isEmpty()){
+            return null;
+        }
+        UserPlaylist userPlaylist=optionalUserPlaylist.get();
+        List<Playlist> playlists=userPlaylist.getPlaylists();
+        int index=-1;
+        for(Playlist playlist:playlists){
+
+            if(playlist.getId().equals(playlistId)) {
+                index=playlists.indexOf(playlist);
+            }
+
+        }
+        if(index!=-1){
+            return playlists.get(index);
+        }
+        else{
+            return null;
+        }
+    }
 }

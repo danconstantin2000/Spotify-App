@@ -107,10 +107,18 @@ public class SongService implements ISongService {
     public void update(int id, SongDTO modifiedSong) {
         Song song = songRepository.findById(id).orElseThrow(()->new SongBadRequestException(id));
         SongDTO newSong=convertToDTO(song);
-        newSong.setName(modifiedSong.getName());
+        if(modifiedSong.getName()!=null) {
+            newSong.setName(modifiedSong.getName());
+        }
+        if(modifiedSong.getGen()!=null){
         newSong.setGen(modifiedSong.getGen());
-        newSong.setType(modifiedSong.getType());
-        newSong.setYear(modifiedSong.getYear());
+        }
+        if(modifiedSong.getType()!=null) {
+            newSong.setType(modifiedSong.getType());
+        }
+        if(modifiedSong.getYear()!=0) {
+            newSong.setYear(modifiedSong.getYear());
+        }
         songRepository.save(convertToEntity(newSong));
     }
 

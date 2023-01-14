@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import pos.mongodb_application.playlist.UserAuthorization;
 import pos.mongodb_application.playlist.dto.InputPlaylistDto;
 import pos.mongodb_application.playlist.dto.InputUserPlaylistDto;
+import pos.mongodb_application.playlist.models.Playlist;
 import pos.mongodb_application.playlist.models.UserPlaylist;
 import pos.mongodb_application.playlist.services.interfaces.IUserPlaylistService;
 
@@ -257,4 +258,42 @@ public class UserPlaylistController {
         }
     }
 
+    @GetMapping("userPlaylist/{userPlaylistId}/playlist/{playlistId}")
+    public  ResponseEntity<?> getPlaylist(@PathVariable String userPlaylistId, @PathVariable String playlistId,
+                                             @RequestHeader (required = false, name="Authorization") String authorization) {
+        int userId = userPlaylistService.findById(userPlaylistId).getUid();
+        if (authorization == null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String jwt_token = authorization.split(" ")[1];
+        UserAuthorization.authorize(jwt_token);
+        org.json.JSONObject user = UserAuthorization.authorize(jwt_token);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        int UID = user.getInt("uid");
+        JSONArray roles = user.getJSONArray("roles");
+        boolean isClient = false;
+        for (int i = 0; i < roles.length(); i++) {
+            int role = roles.getInt(i);
+            if (role == 3) {
+                isClient = true;
+            }
+
+        }
+        if (userId == UID && isClient) {
+
+            Playlist playlist = userPlaylistService.getPlaylist(userPlaylistId,playlistId);
+            if(playlist==null){
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            else{
+                return  new ResponseEntity<>(playlist,HttpStatus.OK);
+            }
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+    }
 }

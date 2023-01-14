@@ -2,6 +2,7 @@ package pos.mongodb_application.playlist.services.interfaces;
 
 import pos.mongodb_application.playlist.dto.InputPlaylistDto;
 import pos.mongodb_application.playlist.dto.InputUserPlaylistDto;
+import pos.mongodb_application.playlist.models.Playlist;
 import pos.mongodb_application.playlist.models.UserPlaylist;
 
 import java.util.List;
@@ -15,4 +16,5 @@ public interface IUserPlaylistService {
     public UserPlaylist putSongToPlaylist(String userPlaylistId,String playlistId,int songId);
     public UserPlaylist deleteSongFromPlaylist(String userPlaylistId,String playlistId,int songId);
     public UserPlaylist deletePlaylist(String userPlaylistId, String playlistId);
+    public Playlist getPlaylist(String userPlaylistId, String playlistId);
 }
