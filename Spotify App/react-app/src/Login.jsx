@@ -1,12 +1,14 @@
 import React, { useState } from "react"
+import { useNavigate } from "react-router-dom";
 export const Login = (props) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
+    const navigate = useNavigate();
+    const redirect = () => {
+        navigate('/')
+    }
     const handleSubmit = (e) => {
         e.preventDefault()
-        console.log(username)
-        console.log(password)
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -17,9 +19,15 @@ export const Login = (props) => {
                 .then((response) => response.json())
                 .then((data) => {
 
+                    let user = {
+                        jwt_token: data.jwt_token,
+                        uid: data.uid,
+                        roles: data.roles,
+                        username: data.username
+                    }
+                    localStorage.setItem("user", JSON.stringify(user))
+                    redirect()
 
-                    console.log(data.jwt_token);
-                    localStorage.setItem("jwt_token", data.jwt_token)
 
 
                 })
