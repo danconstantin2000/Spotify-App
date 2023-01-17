@@ -1,6 +1,7 @@
 package com.example.ApiGateway.controllers;
 
 import com.example.ApiGateway.dtos.LoginDto;
+import com.example.ApiGateway.dtos.LogoutDto;
 import com.example.ApiGateway.services.UserService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +38,23 @@ public class UserController {
         }
         else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+    @PostMapping("/logout")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> logout(@RequestBody LogoutDto logoutDto){
+
+        String success=userService.Logout(logoutDto);
+        if(success!=null){
+            if(success.equals("SUCCESS")){
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
     }

@@ -1,7 +1,12 @@
 import React from 'react';
 
 function Home() {
-    return <h1 class="home-h1">Bine ai venit pe pagina spotify. Pentru a afla mai multe, faceti click pe pagina "About".</h1>
+    return <div class="about">
+        <h2>Spotify - platforma de care ai nevoie!</h2>
+
+        <div>Spotify este o platforma destinata management-ului de melodii. Fiecare user poate sa-si puna in playlist ce melodii doreste!</div>
+
+    </div>
 }
 
 export default Home;

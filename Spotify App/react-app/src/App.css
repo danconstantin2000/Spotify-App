@@ -1,10 +1,13 @@
 .App {
   text-align: center;
-  display: flex;
+
   min-height: 100vh;
+
+  background-color: rgb(68, 70, 69);
+  display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb(68, 70, 69);
+  font-family: 'Times New Roman', Times, serif
 }
 
 .auth-form-container,
@@ -49,6 +52,7 @@ button {
 
 .about {
   color: rgb(240, 245, 240);
+  font-size: 20px;
 }
 
 .Auth-form-container {
@@ -90,4 +94,38 @@ label {
 .info {
   color: white;
   font-size: 30px;
+}
+
+.header {
+  font-weight: 800;
+  border: 3px solid #198754;
+  color: white;
+}
+
+.song {
+
+  border: 3px solid #198754;
+  color: white;
+}
+
+.songInfo {
+  font-size: 20px;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+
+
+}
+
+a:hover {
+  color: #848485;
+  cursor: pointer;
+}
+
+a.disabled {
+
+  color: #272727;
+  cursor: auto;
 }

@@ -41,7 +41,7 @@ class ComplexModelUser(ComplexModel):
         self.roles=roles
 
 class IDMService(ServiceBase):
-    @rpc(String, String, _returns=Boolean)
+    @rpc(String, String, _returns=Integer)
     def add_user(ctx, username, password):
 
         print("Creating user:")
@@ -51,12 +51,12 @@ class IDMService(ServiceBase):
         if new_user:
             users_roles = assign_role(new_user.UID, 3)
             if users_roles:
-                return True
+                return new_user.UID;
             else:
-                return False
-            return True
+                return -1
+            return new_user.UID
         else:
-            return False
+            return -1
 
     @rpc(Integer,String,String,_returns=Boolean)
     def change_password(ctx,UID,password,jwt_token):

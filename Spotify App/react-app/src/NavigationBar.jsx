@@ -12,6 +12,22 @@ function NavigationBar() {
     }
     const logout = () => {
         localStorage.clear();
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        };
+        const fetchData = () => {
+            return fetch('http://localhost:8082/api/gateway/logout', requestOptions)
+                .then((response) => response.json())
+                .then((data) => {
+
+
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+        fetchData()
         navigate("/")
     }
     return (
@@ -22,7 +38,7 @@ function NavigationBar() {
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
 
-                        <Nav.Link href="/about">About</Nav.Link>
+
                         {auth ? (
                             <>
                                 <Nav.Link href="/user_profile">{user.username}</Nav.Link>
@@ -35,7 +51,8 @@ function NavigationBar() {
                         </>
 
                         )}
-
+                        <Nav.Link href="/songs">Songs</Nav.Link>
+                        <Nav.Link href="/artists">Artists</Nav.Link>
 
                     </Nav>
 

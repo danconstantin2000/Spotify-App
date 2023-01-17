@@ -1,6 +1,7 @@
 package com.example.ApiGateway.services;
 
 import com.example.ApiGateway.dtos.LoginDto;
+import com.example.ApiGateway.dtos.LogoutDto;
 import org.json.JSONException;
 import org.springframework.stereotype.Service;
 import org.json.JSONObject;
@@ -84,6 +85,44 @@ public class UserService {
 
         if(doc.getElementsByTagName("tns:loginResult").item(0)!=null){
             String message=doc.getElementsByTagName("tns:loginResult").item(0).getTextContent();
+            if(isValid(message)){
+                return null;
+            }
+            else{
+                return message;
+            }
+
+        }
+        return null;
+
+    }
+    public  String Logout(LogoutDto logoutDto){
+        String requestBody ="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+"<soap11env:Envelope xmlns:soap11env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:service=\"services.IDM.soap\">\n" +
+                "    <soap11env:Body>\n" +
+                "        <service:logout>\n" +
+                "            <service:jwt_token>"+logoutDto.getJwt_token()+"</service:jwt_token>\n" +
+                "        </service:logout>\n" +
+                "    </soap11env:Body>\n" +
+                "</soap11env:Envelope>";
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://127.0.0.1:8000/"))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        HttpResponse<String> response = null;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        Document doc = convertStringToDocument(response.body());
+
+        if(doc.getElementsByTagName("tns:logoutResult").item(0)!=null){
+            String message=doc.getElementsByTagName("tns:logoutResult").item(0).getTextContent();
             if(isValid(message)){
                 return null;
             }
