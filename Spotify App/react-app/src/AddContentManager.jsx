@@ -1,33 +1,42 @@
-
 import { redirect } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
-export const Register = (props) => {
+
+export const AddContentManager = (props) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [user, setUser] = useState('');
     const [successRegistered, setSuccessRestered] = useState('');
     useEffect(() => {
+        const auth = localStorage.getItem('user');
+        let user = null
+        if (auth) {
+            user = JSON.parse(auth);
+        }
+        setUser(user)
+
         setSuccessRestered(null)
     }, [])
     const navigate = useNavigate();
     const redirect = () => {
         navigate('/')
     }
+
     const handleSubmit = (e) => {
         e.preventDefault()
         const requestOptions = {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': "Bearer " + user.jwt_token },
             body: JSON.stringify({ username: username, password: password })
         };
         const fetchData = () => {
-            return fetch('http://localhost:8082/api/gateway/register', requestOptions)
+            return fetch('http://localhost:8082/api/gateway/register/contentManager', requestOptions)
                 .then((response) => {
-                    response.json()
-                    if (response.status == 409) {
+
+                    if (response.status == 406 || response.status == 401 || response.status == 409 || response.statust == 403) {
                         setSuccessRestered(false)
                     }
-                    else if (response.status == 200) {
+                    else if (response.status == 201) {
                         setSuccessRestered(true)
                     }
 
@@ -43,25 +52,25 @@ export const Register = (props) => {
                 });
         }
         fetchData()
+        console.log("Da")
 
     }
+
     return (
         <>
-
-
             <div className="Auth-form-container">
 
                 <form className="Auth-form" onSubmit={handleSubmit}>
                     <div className="Auth-form-content">
                         <div>
                             {successRegistered == true ? (
-                                <div class="alert alert-success">Inregistrare cu success!</div>
+                                <div class="alert alert-success">Adaugare cu succes!</div>
                             ) : null}
                             {successRegistered == false ? (
-                                <div class="alert alert-danger">Inregistrarea a esuat!</div>
+                                <div class="alert alert-danger">Adaugare esuata!</div>
                             ) : null}
                         </div>
-                        <h3 className="Auth-form-title">Register In</h3>
+                        <h3 className="Auth-form-title">Adauga content manager</h3>
                         <div className="form-group mt-3">
                             <label for="username">Username</label>
                             <input
@@ -108,5 +117,6 @@ export const Register = (props) => {
                 </form>
             </div >
         </>
-    )
+    );
 }
+

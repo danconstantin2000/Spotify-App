@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Routes } from "react-router-dom";
 import { Route } from "react-router-dom";
 import Home from "./Home";
@@ -10,8 +9,20 @@ import UserInfo from "./UserInfo";
 import Songs from "./Songs";
 import Artists from "./Artists";
 import SongInfo from "./SongInfo";
+import { AddContentManager } from "./AddContentManager";
+import { useEffect, useState } from 'react';
+import { AddArtist } from "./AddArtists";
 function App() {
+  const [user, setUser] = useState('');
+  useEffect(() => {
+    const auth = localStorage.getItem('user');
+    let user = null
+    if (auth) {
+      user = JSON.parse(auth);
+    }
+    setUser(user)
 
+  }, [])
   return (
     <>
 
@@ -28,6 +39,27 @@ function App() {
           <Route path="/songs" element={<Songs />} />
           <Route path="/artists" element={<Artists />} />
           <Route path="/songs/:id" element={<SongInfo />} />
+
+          {user ? (
+
+            user.roles.includes(4) ? (
+              <>
+
+                <Route path="/addContentManager" element={<AddContentManager />} />
+              </>
+            ) : (
+
+              user.roles.includes(1) ? (
+                <>
+
+                  <Route path="/addArtist" element={<AddArtist />} />
+                </>
+              ) : null
+            )
+
+
+          ) : null}
+
         </Routes>
 
       </div>

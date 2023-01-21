@@ -120,6 +120,10 @@ class IDMService(ServiceBase):
             return False
         user_json = json.loads(output)
         roles = user_json["roles"]
+        print(roles)
+        if new_RID == 2:
+            if 1 in roles:
+                return edit_role(UID,RID,new_RID)
         if 4 in roles:
             return edit_role(UID,RID,new_RID)
         return False
@@ -167,9 +171,8 @@ class IDMService(ServiceBase):
     @rpc(String,_returns=String)
     def authorize(ctx, jwt_token):
         blacklist = BlacklistToken(jwt_token)
-        check=BlacklistToken.checkIfBlackListed(jwt_token)
-        if check is True:
-            return "ERROR!"
+
+
         uid,roles=decode_jwt_token(jwt_token)
         if uid == -1 or uid == -2:
             return "ERROR!"

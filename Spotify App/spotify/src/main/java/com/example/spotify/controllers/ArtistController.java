@@ -169,6 +169,7 @@ public class ArtistController {
         if(authorization==null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+
         String jwt_token=authorization.split(" ")[1];
         UserAuthorization.authorize(jwt_token);
         org.json.JSONObject user=UserAuthorization.authorize(jwt_token);

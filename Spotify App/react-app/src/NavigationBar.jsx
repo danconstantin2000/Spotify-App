@@ -38,11 +38,22 @@ function NavigationBar() {
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
 
-
+                        <Nav.Link href="/songs">Songs</Nav.Link>
+                        <Nav.Link href="/artists">Artists</Nav.Link>
                         {auth ? (
                             <>
                                 <Nav.Link href="/user_profile">{user.username}</Nav.Link>
                                 <Nav.Link onClick={logout}>Logout</Nav.Link>
+
+                                {user.roles.includes(4) ? (
+                                    <Nav.Link href="/addContentManager" >Add Content Manager</Nav.Link>
+
+                                ) : (
+                                    user.roles.includes(1) ? (
+                                        <Nav.Link href="/addArtist" >Add artist</Nav.Link>
+
+                                    ) : null
+                                )}
                             </>
 
                         ) : (<>
@@ -51,8 +62,7 @@ function NavigationBar() {
                         </>
 
                         )}
-                        <Nav.Link href="/songs">Songs</Nav.Link>
-                        <Nav.Link href="/artists">Artists</Nav.Link>
+
 
                     </Nav>
 
