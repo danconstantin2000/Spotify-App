@@ -259,6 +259,22 @@ public class UserService {
                     return null;
                 }
                 else{
+
+                    JSONObject object = new JSONObject();
+                    object.put("uid",userId);
+                    String jwtToken = Login(loginDto);
+
+                    StringEntity entity = new StringEntity(object.toString(),
+                            ContentType.APPLICATION_JSON);
+
+                    org.apache.http.client.HttpClient postclient = HttpClientBuilder.create().build();
+                    HttpPost postRequest = new HttpPost("http://localhost:8080/api/pos_playlist/userPlaylist");
+                    postRequest.setHeader("Authorization", "Bearer " + jwtToken);
+                    postRequest.setEntity(entity);
+
+                    org.apache.http.HttpResponse response1 = postclient.execute(postRequest);
+
+
                     return message;
                 }
             }catch (Exception ex){
@@ -635,5 +651,91 @@ public class UserService {
             }
         }
         return -1;
+    }
+
+    public int addPlaylist(AddPlaylistDto addPlaylistDto, String jwtToken,int uid){
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create("http://localhost:8080/api/pos_playlist/userPlaylist/user/"+uid))
+                .header("Authorization","Bearer "+jwtToken)
+                .build();
+
+        HttpResponse<String> response = null;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        JSONObject body = new JSONObject(response.body());
+        String userPlaylistId=body.getString("id");
+        if(userPlaylistId!=null){
+
+            JSONObject object = new JSONObject();
+            object.put("title", addPlaylistDto.getTitle());
+            StringEntity entity = new StringEntity(object.toString(),
+                    ContentType.APPLICATION_JSON);
+
+            org.apache.http.client.HttpClient client = HttpClientBuilder.create().build();
+            HttpPost postRequest = new HttpPost("http://localhost:8080/api/pos_playlist/userPlaylist/"+userPlaylistId+"/playlist");
+            postRequest.setHeader("Authorization", "Bearer " + jwtToken);
+            postRequest.setEntity(entity);
+
+
+            int statusCode=-1;
+            try {
+                org.apache.http.HttpResponse response1 = client.execute(postRequest);
+                statusCode= response1.getStatusLine().getStatusCode();
+            }
+            catch (Exception ex){
+                ex.printStackTrace();
+            }
+            return statusCode;
+
+
+        }
+        return -1;
+    }
+
+    public JSONArray getPlaylists(String jwtToken,int uid){
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create("http://localhost:8080/api/pos_playlist/userPlaylist/user/"+uid))
+                .header("Authorization","Bearer "+jwtToken)
+                .build();
+
+        HttpResponse<String> response = null;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        JSONObject body = new JSONObject(response.body());
+        String userPlaylistId=body.getString("id");
+        if(userPlaylistId!=null){
+            HttpRequest getRequest = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create("http://localhost:8080/api/pos_playlist/userPlaylist/"+userPlaylistId+"/playlists"))
+                    .header("Authorization","Bearer "+jwtToken)
+                    .build();
+
+            HttpResponse<String> getResponse = null;
+            try {
+                getResponse = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            JSONArray jsonArray=new JSONArray(getResponse.body());
+            return jsonArray;
+
+
+
+        }
+        return null;
     }
 }

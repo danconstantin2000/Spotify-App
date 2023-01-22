@@ -224,4 +224,15 @@ public class UserPlaylistService implements IUserPlaylistService {
             return null;
         }
     }
+    public List<Playlist> getPlaylists(String userPlaylistId){
+
+        Optional<UserPlaylist> optionalUserPlaylist= userPlaylistCollectionRepository.findById(userPlaylistId);
+        if(optionalUserPlaylist.isEmpty()){
+            return null;
+        }
+        UserPlaylist userPlaylist=optionalUserPlaylist.get();
+        List<Playlist> playlists=userPlaylist.getPlaylists();
+
+        return  playlists;
+    }
 }

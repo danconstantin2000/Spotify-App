@@ -6,9 +6,13 @@ import { useEffect, useState } from 'react';
 
 function SongInfo() {
 
+
     const params = useParams();
     const id = params.id;
+
     useEffect(() => {
+
+
         getSongData();
         getArtists(id);
     }, [])
@@ -18,6 +22,7 @@ function SongInfo() {
     };
     const [song, setSong] = useState([]);
     const [artists, setArtists] = useState([]);
+
     const getSongData = async () => {
         const response = await fetch(`http://localhost:8082/api/gateway/songs/${id}`, requestOptions)
             .then((response) => response.json())

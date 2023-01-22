@@ -17,4 +17,5 @@ public interface IUserPlaylistService {
     public UserPlaylist deleteSongFromPlaylist(String userPlaylistId,String playlistId,int songId);
     public UserPlaylist deletePlaylist(String userPlaylistId, String playlistId);
     public Playlist getPlaylist(String userPlaylistId, String playlistId);
+    public List<Playlist> getPlaylists(String userPlaylistId);
 }

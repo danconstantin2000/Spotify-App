@@ -101,7 +101,7 @@ function Songs() {
                         {songs.map((song) => (
 
                             < div className="container d-flex flex-row mb-3 song p-4 bg-dark" >
-                                <a href="/songs/{song.id}" class="col-4">{song.name}</a>
+                                <a href={"/songs/" + song.id} class="col-4">{song.name}</a>
                                 <div class="col-3">{song.gen}</div>
                                 <div class="col-3">{song.year}</div>
                                 <div className="col-2">{song.type}</div>

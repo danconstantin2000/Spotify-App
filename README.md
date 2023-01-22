@@ -1,5 +1,5 @@
 # POS - solutii laborator/proiect
-
+Status: Todo add song in playlist
 | **Deadline** | **_22.01.2023_** (_duminica_) |
 | :--- | :--- |
 | **Ce se va preda?** | **_Laborator_**: pentru fiecare laborator propus se va crea cate un director cu numele laboratorului respectiv; in cadrul acestui director se vor incarca fisierele care contin codurile sursa ale solutiilor propuse si un set de log-uri demonstrative.<br/><br/>**_SAU_**<br/><br/>**_Proiect_**: se vor incarca fisierele care contin codurile sursa ale proiectului, organizate pe module, si un set de log-uri demonstrative. |

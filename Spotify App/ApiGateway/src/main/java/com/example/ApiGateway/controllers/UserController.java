@@ -233,5 +233,52 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping("/addPlaylist")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> addPlaylist(@RequestBody AddPlaylistDto addPlaylistDto,@RequestHeader(required = false, name = "Authorization") String authorization) {
+        Integer response = null;
+        if (authorization == null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String jwt_token = authorization.split(" ")[1];
+        JSONObject user = userService.authorize(jwt_token);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        int UID=user.getInt("uid");
+
+        int statusCode = userService.addPlaylist(addPlaylistDto,jwt_token,UID);
+        if(statusCode!=-1){
+            return new ResponseEntity<>(HttpStatus.valueOf(statusCode));
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
+    @GetMapping("/getPlaylists")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> getPlaylists(@RequestHeader(required = false, name = "Authorization") String authorization) {
+        Integer response = null;
+        if (authorization == null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String jwt_token = authorization.split(" ")[1];
+        JSONObject user = userService.authorize(jwt_token);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        int UID=user.getInt("uid");
+
+        JSONArray playlists = userService.getPlaylists(jwt_token,UID);
+        if(playlists!=null){
+            return new ResponseEntity<>(playlists.toList(),HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
 }
 

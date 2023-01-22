@@ -14,6 +14,8 @@ import { useEffect, useState } from 'react';
 import { AddArtist } from "./AddArtists";
 import { AddSong } from "./AddSong";
 import GetSongsFromArtist from "./GetSongsFromArtist";
+import { AddPlaylist } from "./AddPlaylist";
+import GetPlaylist from "./GetPlaylists";
 function App() {
   const [user, setUser] = useState('');
   useEffect(() => {
@@ -63,7 +65,14 @@ function App() {
                     <Route path="/addSong" element={<AddSong />} />
                     <Route path="/mySongs" element={<GetSongsFromArtist />} />
                   </>
-                ) : null
+                ) : (user.roles.includes(3) ? (
+                  <>
+
+                    <Route path="/addPlaylist" element={<AddPlaylist />} />
+                    <Route path="/getPlaylists" element={<GetPlaylist />} />
+
+                  </>
+                ) : null)
               )
             )
 

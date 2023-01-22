@@ -60,7 +60,13 @@ function NavigationBar() {
                                                 <Nav.Link href="/addSong" >Add Song</Nav.Link>
                                                 <Nav.Link href="/mySongs" >My Songs</Nav.Link>
                                             </>
-                                        ) : null
+                                        ) : (user.roles.includes(3) ? (
+                                            <>
+                                                <Nav.Link href="/addPlaylist" >Add Playlist</Nav.Link>
+                                                <Nav.Link href="/getPlaylists" >My Playlists</Nav.Link>
+
+                                            </>
+                                        ) : null)
                                     ))}
                             </>
 
