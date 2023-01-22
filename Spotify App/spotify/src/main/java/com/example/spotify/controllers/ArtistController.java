@@ -303,7 +303,7 @@ public class ArtistController {
                                     linkTo(methodOn(SongController.class).one(song.getId())).withSelfRel(),
                                     linkTo(methodOn(ArtistController.class).getAllFromArtist(uuid)).withRel("parent"))).collect(Collectors.toList());
                     response.put("songs", returnedSongs);
-                    return new ResponseEntity<>(response, HttpStatus.OK);
+                    return new ResponseEntity<>(response, HttpStatus.CREATED);
                 }
                 else{
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);

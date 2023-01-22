@@ -164,5 +164,74 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
+
+    @PostMapping("/addSong")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> addSong(@RequestBody SongDto songDto, @RequestHeader(required = false, name = "Authorization") String authorization) {
+        Integer response = null;
+        if (authorization == null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String jwt_token = authorization.split(" ")[1];
+        JSONObject user = userService.authorize(jwt_token);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        int UID=user.getInt("uid");
+
+        int statusCode=userService.addSong(UID,songDto,jwt_token);
+
+        if(statusCode!=-1) {
+            return new ResponseEntity<>(HttpStatus.valueOf(statusCode));
+
+        }
+        else{
+            return  new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+    @GetMapping("/artistsSongs")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> getSongs(@RequestHeader(required = false, name = "Authorization") String authorization) {
+        Integer response = null;
+        if (authorization == null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String jwt_token = authorization.split(" ")[1];
+        JSONObject user = userService.authorize(jwt_token);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        int UID=user.getInt("uid");
+
+        JSONArray songs = userService.getSongsFromArtist(UID);
+        if(songs!=null){
+            return new ResponseEntity<>(songs.toList(),HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @DeleteMapping("/artistsSongs/{songId}")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> deleteSong(@PathVariable int songId,@RequestHeader(required = false, name = "Authorization") String authorization) {
+        Integer response = null;
+        if (authorization == null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String jwt_token = authorization.split(" ")[1];
+        JSONObject user = userService.authorize(jwt_token);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        int UID=user.getInt("uid");
+
+        int statusCode = userService.deleteSongFromArtists(UID,songId,jwt_token);
+        if(statusCode!=-1){
+            return new ResponseEntity<>(HttpStatus.valueOf(statusCode));
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
 

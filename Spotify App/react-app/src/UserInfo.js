@@ -21,11 +21,11 @@ function UserInfo() {
         <>
             {auth ? (
                 <>
-                    <div class="container info">
+                    <div class="container d-flex flex-column mb-3 song p-4 bg-dark songInfo ">
 
-                        <div>Username:{user.username}</div>
-                        <div>Id:{user.uid}</div>
-                        <div>Roluri</div>
+                        <div class="mb-3 container d-flex justify-content-around col-3"> <div>Username:</div> <div>{user.username}</div></div>
+                        <div class="mb-3 container d-flex justify-content-around col-3"><div>Id:</div><div>{user.uid}</div></div>
+                        <div class="mb-3 container d-flex justify-content-around col-3">Roluri</div>
                         {user.roles.map((role) => (
                             <li >{renderRoles(role)}</li>
                         ))}

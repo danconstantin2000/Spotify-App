@@ -124,7 +124,7 @@ public class ArtistService implements IArtistService {
         else{
             artist.removeSong(song);
             song.removeArtist(artist);
-            songRepository.save(song);
+            songRepository.delete(song);
             artistRepository.save(artist);
         }
     }

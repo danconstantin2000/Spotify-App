@@ -2,12 +2,13 @@ import { redirect } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 
-export const AddArtist = (props) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [active, setActive] = useState('');
+export const AddSong = (props) => {
+    const [name, setName] = useState('');
+    const [year, setYear] = useState('');
+    const [gen, setGen] = useState('');
+    const [type, setType] = useState('');
     const [user, setUser] = useState('');
-    const [successRegistered, setSuccessRestered] = useState('');
+    const [successAdded, setSuccessAdded] = useState('');
     useEffect(() => {
         const auth = localStorage.getItem('user');
         let user = null
@@ -15,38 +16,38 @@ export const AddArtist = (props) => {
             user = JSON.parse(auth);
         }
         setUser(user)
-        setActive(false)
-        setSuccessRestered(null)
+        setGen("ROCK")
+        setType("SONG")
+        setSuccessAdded(null)
     }, [])
     const navigate = useNavigate();
-    const redirect = () => {
-        navigate('/')
 
-    }
 
     const handleSubmit = (e) => {
         e.preventDefault()
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': "Bearer " + user.jwt_token },
-            body: JSON.stringify({ username: username, password: password, active: active })
+            body: JSON.stringify({ name: name, year: year, gen: gen, type: type })
         };
         const fetchData = () => {
-            return fetch('http://localhost:8082/api/gateway/register/artist', requestOptions)
+
+            return fetch('http://localhost:8082/api/gateway/addSong', requestOptions)
                 .then((response) => {
 
                     if (response.status == 406 || response.status == 401 || response.status == 409 || response.statust == 403) {
-                        setSuccessRestered(false)
+                        setSuccessAdded(false)
                     }
                     else if (response.status == 201) {
-                        setSuccessRestered(true)
+                        setSuccessAdded(true)
+
                     }
 
                 })
                 .then((data) => {
 
 
-                    console.log(active);
+
 
                 })
                 .catch((error) => {
@@ -56,8 +57,8 @@ export const AddArtist = (props) => {
         fetchData()
 
 
-    }
 
+    }
 
     return (
         <>
@@ -66,59 +67,65 @@ export const AddArtist = (props) => {
                 <form className="Auth-form" onSubmit={handleSubmit}>
                     <div className="Auth-form-content">
                         <div>
-                            {successRegistered == true ? (
+                            {successAdded == true ? (
                                 <div class="alert alert-success">Adaugare cu succes!</div>
                             ) : null}
-                            {successRegistered == false ? (
+                            {successAdded == false ? (
                                 <div class="alert alert-danger">Adaugare esuata!</div>
                             ) : null}
                         </div>
-                        <h3 className="Auth-form-title">Adauga artist</h3>
+                        <h3 className="Auth-form-title">Add Song:</h3>
                         <div className="form-group mt-3">
-                            <label for="username">Username</label>
+                            <label for="name">The name of the song:</label>
                             <input
                                 type="text"
                                 className="form-control mt-1"
-                                placeholder="Enter username"
-                                name="username"
-                                id="username"
+                                placeholder="Enter the name:"
+                                name="name"
+                                id="name"
                                 required minLength={3} maxLength={30}
-                                value={username} onChange={(e) => setUsername(e.target.value)}
+                                value={name} onChange={(e) => setName(e.target.value)}
                             />
                         </div>
                         <div className="form-group mt-3">
-                            <label for="password">Password</label>
+                            <label for="gen" class="m-2">Choose the genre:</label>
+
+                            <select name="gen" id="gen" value={gen} onChange={(e) => setGen(e.target.value)}>
+                                <option value="ROCK">ROCK</option>
+                                <option value="METAL">METAL</option>
+                                <option value="RAP">RAP</option>
+                                <option value="TRAP">TRAP</option>
+                                <option value="JAZZ">JAZZ</option>
+                                <option value="POP">POP</option>
+                            </select>
+                        </div>
+                        <div className="form-group mt-3">
+                            <label for="type" class="m-2">Choose the type:</label>
+                            <select name="type" id="type" value={type} onChange={(e) => setType(e.target.value)}>
+                                <option value="SINGLE">SINGLE</option>
+                                <option value="ALBUM">ALBUM</option>
+                                <option value="SONG">SONG</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group mt-3">
+                            <label for="year">Choose the year: </label>
                             <input
-                                type="password"
+                                type="number"
                                 className="form-control mt-1"
-                                placeholder="Enter password"
-                                name="password"
-                                id="password"
-                                required minLength={3} maxLength={30}
-                                value={password} onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter the year:"
+                                name="year"
+                                id="year"
+                                min={1900} max={2023}
+
+                                value={year} onChange={(e) => setYear(e.target.value)}
                             />
                         </div>
-                        <div className="form-group mt-3 mb-0">
-                            <label for="active">Is Active?</label>
-                            <input
-                                type="checkbox"
-                                className="m-1 "
-                                placeholder="Enter password"
-                                name="active"
-                                id="active"
-                                checked={active} onChange={(e) => {
-
-                                    return setActive(e.target.checked)
-                                }}
-
-                            />
-                        </div>
-                        <div className="form-group mt-1">
+                        <div className="form-group mt-3">
                             <label for="terms">I accept the terms and conditions.</label>
                             <input
                                 type="checkbox"
                                 className="m-3 "
-                                placeholder="Enter password"
                                 name="terms"
                                 id="terms"
                                 required

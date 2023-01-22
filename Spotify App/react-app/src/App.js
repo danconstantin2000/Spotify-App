@@ -12,6 +12,8 @@ import SongInfo from "./SongInfo";
 import { AddContentManager } from "./AddContentManager";
 import { useEffect, useState } from 'react';
 import { AddArtist } from "./AddArtists";
+import { AddSong } from "./AddSong";
+import GetSongsFromArtist from "./GetSongsFromArtist";
 function App() {
   const [user, setUser] = useState('');
   useEffect(() => {
@@ -54,7 +56,15 @@ function App() {
 
                   <Route path="/addArtist" element={<AddArtist />} />
                 </>
-              ) : null
+              ) : (
+                user.roles.includes(2) ? (
+                  <>
+
+                    <Route path="/addSong" element={<AddSong />} />
+                    <Route path="/mySongs" element={<GetSongsFromArtist />} />
+                  </>
+                ) : null
+              )
             )
 
 

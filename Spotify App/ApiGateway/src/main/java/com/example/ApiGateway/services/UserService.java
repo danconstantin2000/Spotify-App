@@ -7,8 +7,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -459,4 +461,179 @@ public class UserService {
 
     }
 
+    public int addSong(int userId,SongDto songDto,String jwtToken) {
+
+        String username = getUserName(userId);
+        if (username != null) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create("http://localhost:8081/api/songcollection/artists"))
+                    .build();
+
+            HttpResponse<String> response = null;
+            try {
+                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            JSONObject body = new JSONObject(response.body());
+            JSONObject embeddedObject=body.getJSONObject("_embedded");
+            JSONArray jsonArray=embeddedObject.getJSONArray("artistDTOList");
+            String uuid=null;
+            for(int i=0;i<jsonArray.length();i++){
+                JSONObject jsonObject=jsonArray.getJSONObject(i);
+                String artistUsername=jsonObject.getString("name");
+                if(artistUsername.equals(username)){
+                    uuid=jsonObject.getString("uuid");
+                    break;
+                }
+            }
+            if(uuid!=null){
+                try {
+                    JSONArray jsonArray1=new JSONArray();
+                    JSONObject object = new JSONObject();
+                    object.put("name", songDto.getName());
+                    object.put("gen", songDto.getGen());
+                    object.put("type", songDto.getType());
+                    object.put("year", songDto.getYear());
+                    jsonArray1.put(object);
+                    StringEntity entity = new StringEntity(jsonArray1.toString(),
+                            ContentType.APPLICATION_JSON);
+
+                    org.apache.http.client.HttpClient client = HttpClientBuilder.create().build();
+                    HttpPost postRequest = new HttpPost("http://localhost:8081/api/songcollection/artists/"+uuid+"/songs");
+                    postRequest.setHeader("Authorization", "Bearer " + jwtToken);
+                    postRequest.setEntity(entity);
+
+                    org.apache.http.HttpResponse response1 = client.execute(postRequest);
+
+                    int statusCode= response1.getStatusLine().getStatusCode();
+
+                    return  statusCode;
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+            HttpStatusCode statusCode = HttpStatusCode.valueOf(response.statusCode());
+        }
+        return -1;
+    }
+
+    public JSONArray getSongsFromArtist(int userId) {
+        String username = getUserName(userId);
+        if (username != null) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create("http://localhost:8081/api/songcollection/artists"))
+                    .build();
+
+            HttpResponse<String> response = null;
+            try {
+                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            JSONObject body = new JSONObject(response.body());
+            JSONObject embeddedObject = body.getJSONObject("_embedded");
+            JSONArray jsonArray = embeddedObject.getJSONArray("artistDTOList");
+            String uuid = null;
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String artistUsername = jsonObject.getString("name");
+                if (artistUsername.equals(username)) {
+                    uuid = jsonObject.getString("uuid");
+                    break;
+                }
+            }
+            if (uuid != null) {
+                try {
+                    HttpRequest getRequest = HttpRequest.newBuilder()
+                            .GET()
+                            .uri(URI.create("http://localhost:8081/api/songcollection/artists/" + uuid + "/songs"))
+                            .build();
+
+                    HttpResponse<String> getResponse = null;
+                    try {
+                        getResponse = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    JSONObject requestBody = new JSONObject(getResponse.body());
+                    JSONObject _embedded = requestBody.getJSONObject("_embedded");
+                    JSONArray songList = _embedded.getJSONArray("songDTOList");
+                    return songList;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            else{
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public int deleteSongFromArtists(int userId,int songId,String jwtToken) {
+        String username = getUserName(userId);
+        if (username != null) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create("http://localhost:8081/api/songcollection/artists"))
+                    .build();
+
+            HttpResponse<String> response = null;
+            try {
+                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            JSONObject body = new JSONObject(response.body());
+            JSONObject embeddedObject = body.getJSONObject("_embedded");
+            JSONArray jsonArray = embeddedObject.getJSONArray("artistDTOList");
+            String uuid = null;
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String artistUsername = jsonObject.getString("name");
+                if (artistUsername.equals(username)) {
+                    uuid = jsonObject.getString("uuid");
+                    break;
+                }
+            }
+            if (uuid != null) {
+                try {
+                    HttpRequest deleteRequest = HttpRequest.newBuilder()
+                            .DELETE()
+                            .header("Authorization","Bearer "+jwtToken)
+                            .uri(URI.create("http://localhost:8081/api/songcollection/artists/" + uuid + "/songs/"+songId))
+                            .build();
+
+                    HttpResponse<String> deleteResponse = null;
+                    try {
+                        deleteResponse = httpClient.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    return deleteResponse.statusCode();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            else{
+                return -1;
+            }
+        }
+        return -1;
+    }
 }

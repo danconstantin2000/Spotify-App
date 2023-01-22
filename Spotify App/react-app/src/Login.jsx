@@ -1,13 +1,19 @@
-import React, { useState } from "react"
+import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 export const Login = (props) => {
+    useEffect(() => {
+        setSuccessful(null)
+    }, [])
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [successful, setSuccessful] = useState('');
     const navigate = useNavigate();
     const redirect = () => {
         navigate('/')
+
     }
     const handleSubmit = (e) => {
+
         e.preventDefault()
         const requestOptions = {
             method: 'POST',
@@ -16,7 +22,15 @@ export const Login = (props) => {
         };
         const fetchData = () => {
             return fetch('http://localhost:8082/api/gateway/login', requestOptions)
-                .then((response) => response.json())
+                .then((response) => {
+                    if (response.status == 404) {
+                        setSuccessful(false)
+                    }
+                    else {
+                        setSuccessful(true)
+                    }
+                    return response.json()
+                })
                 .then((data) => {
 
                     let user = {
@@ -26,6 +40,7 @@ export const Login = (props) => {
                         username: data.username
                     }
                     localStorage.setItem("user", JSON.stringify(user))
+
                     redirect()
 
 
@@ -55,6 +70,11 @@ export const Login = (props) => {
             <div className="Auth-form-container">
                 <form className="Auth-form" onSubmit={handleSubmit}>
                     <div className="Auth-form-content">
+                        <div>
+                            {successful == false ? (
+                                <div class="alert alert-danger">Log in failed!</div>
+                            ) : null}
+                        </div>
                         <h3 className="Auth-form-title">Sign In</h3>
                         <div className="form-group mt-3">
                             <label for="username">Username</label>

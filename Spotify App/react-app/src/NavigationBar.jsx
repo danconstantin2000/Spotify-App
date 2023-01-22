@@ -1,3 +1,5 @@
+
+
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { Navbar } from 'react-bootstrap';
@@ -52,8 +54,14 @@ function NavigationBar() {
                                     user.roles.includes(1) ? (
                                         <Nav.Link href="/addArtist" >Add artist</Nav.Link>
 
-                                    ) : null
-                                )}
+                                    ) : (
+                                        user.roles.includes(2) ? (
+                                            <>
+                                                <Nav.Link href="/addSong" >Add Song</Nav.Link>
+                                                <Nav.Link href="/mySongs" >My Songs</Nav.Link>
+                                            </>
+                                        ) : null
+                                    ))}
                             </>
 
                         ) : (<>
