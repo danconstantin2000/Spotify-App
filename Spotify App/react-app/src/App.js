@@ -16,6 +16,7 @@ import { AddSong } from "./AddSong";
 import GetSongsFromArtist from "./GetSongsFromArtist";
 import { AddPlaylist } from "./AddPlaylist";
 import GetPlaylist from "./GetPlaylists";
+import PlaylistInfo from "./PlaylistInfo";
 function App() {
   const [user, setUser] = useState('');
   useEffect(() => {
@@ -43,7 +44,8 @@ function App() {
           <Route path="/songs" element={<Songs />} />
           <Route path="/artists" element={<Artists />} />
           <Route path="/songs/:id" element={<SongInfo />} />
-
+          <Route path="/playlists/:id" element={<PlaylistInfo />} />
+          <Route path="/playlists/:id/songs" element={<Songs />} />
           {user ? (
 
             user.roles.includes(4) ? (

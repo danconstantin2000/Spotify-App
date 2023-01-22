@@ -733,9 +733,85 @@ public class UserService {
             JSONArray jsonArray=new JSONArray(getResponse.body());
             return jsonArray;
 
+        }
+        return null;
+    }
 
+    public JSONObject getPlaylist(String jwtToken,int uid, String playlistId){
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create("http://localhost:8080/api/pos_playlist/userPlaylist/user/"+uid))
+                .header("Authorization","Bearer "+jwtToken)
+                .build();
+
+        HttpResponse<String> response = null;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        JSONObject body = new JSONObject(response.body());
+        String userPlaylistId=body.getString("id");
+        if(userPlaylistId!=null){
+            HttpRequest getRequest = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create("http://localhost:8080/api/pos_playlist/userPlaylist/"+userPlaylistId+"/playlist/"+playlistId))
+                    .header("Authorization","Bearer "+jwtToken)
+                    .build();
+
+            HttpResponse<String> getResponse = null;
+            try {
+                getResponse = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            JSONObject object=new JSONObject(getResponse.body());
+            return  object;
 
         }
         return null;
+    }
+
+
+    public int addSongToPlaylist(String jwtToken,int uid,String playlistId,int songId){
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create("http://localhost:8080/api/pos_playlist/userPlaylist/user/"+uid))
+                .header("Authorization","Bearer "+jwtToken)
+                .build();
+
+        HttpResponse<String> response = null;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        JSONObject body = new JSONObject(response.body());
+        String userPlaylistId=body.getString("id");
+        if(userPlaylistId!=null){
+            HttpRequest putRequest = HttpRequest.newBuilder()
+                    .PUT(HttpRequest.BodyPublishers.ofString("{}"))
+                    .uri(URI.create("http://localhost:8080/api/pos_playlist/userPlaylist/"+userPlaylistId+"/playlist/"+playlistId+"/songs/"+songId))
+                    .header("Authorization","Bearer "+jwtToken)
+                    .build();
+
+            HttpResponse<String> getResponse = null;
+            try {
+                getResponse = httpClient.send(putRequest, HttpResponse.BodyHandlers.ofString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return response.statusCode();
+
+        }
+        return -1;
     }
 }

@@ -1,13 +1,22 @@
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { Navbar } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 function Songs() {
-    const auth = localStorage.getItem('user');
+    const params = useParams();
+    const id = params.id;
+
     useEffect(() => {
+        const auth = localStorage.getItem('user');
+        let user = null
+        if (auth) {
+            user = JSON.parse(auth);
+        }
+        setUser(user)
         getSongData(1);
+        setSuccessfullAdded(null)
     }, [])
     const requestOptions = {
         method: 'GET',
@@ -17,6 +26,8 @@ function Songs() {
     const [currentPage, setCurrentPage] = useState([]);
     const [hasNext, setHasNext] = useState([]);
     const [hasPrev, setHasPrev] = useState([]);
+    const [user, setUser] = useState([]);
+    const [successfullAdded, setSuccessfullAdded] = useState([])
     const getSongData = async (page) => {
         const response = await fetch('http://localhost:8082/api/gateway/songs?page=' + page, requestOptions)
             .then((response) => response.json())
@@ -46,12 +57,38 @@ function Songs() {
             });
     }
 
+    const addSongToPlaylist = async (songId) => {
+        const requestOptions = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': "Bearer " + user.jwt_token }
+        };
+
+        const response = await fetch('http://localhost:8082/api/gateway/playlists/' + id + "/songs/" + songId, requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+
+
+            })
+            .catch((error) => {
+
+            });
+        setSuccessfullAdded(true)
+
+    }
+
 
     return (
         <>
-            {auth ? (
+            {user ? (
                 <>
+
                     <div class="container d-flex flex-column mt-3">
+                        <div>
+                            {successfullAdded == true ? (
+
+                                <div class="alert alert-success">Successfull added!</div>
+                            ) : null}
+                        </div>
                         <div class="container d-flex flex-row mb-3 header bg-dark">
                             <div class="col-4 ">Melodie</div>
                             <div class="col-2">Gen</div>
@@ -66,7 +103,12 @@ function Songs() {
                                 <div class="col-2">{song.gen}</div>
                                 <div class="col-2">{song.year}</div>
                                 <div className="col-2">{song.type}</div>
-                                <button className="col-2 btn btn-success">Adauga</button>
+                                {id ? (
+                                    <button className="col-2 btn btn-success" onClick={() => {
+                                        addSongToPlaylist(song.id)
+                                    }}>Adauga</button>
+                                ) : null}
+
                             </div>
 
                         ))

@@ -280,5 +280,55 @@ public class UserController {
         }
     }
 
+    @GetMapping("/getPlaylist/{playlistId}")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> getPlaylist(
+            @PathVariable String playlistId,
+            @RequestHeader(required = false, name = "Authorization") String authorization) {
+        Integer response = null;
+        if (authorization == null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String jwt_token = authorization.split(" ")[1];
+        JSONObject user = userService.authorize(jwt_token);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        int UID=user.getInt("uid");
+
+        JSONObject playlist = userService.getPlaylist(jwt_token,UID,playlistId);
+        if(playlist!=null){
+            return new ResponseEntity<>(playlist.toMap(),HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
+    @PutMapping("/playlists/{playlistId}/songs/{songId}")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<?> putSongToPlaylist(
+            @PathVariable String playlistId,
+            @PathVariable int songId,
+            @RequestHeader(required = false, name = "Authorization") String authorization) {
+        Integer response = null;
+        if (authorization == null || !authorization.matches("Bearer\\s[\\x00-\\x7F]+")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String jwt_token = authorization.split(" ")[1];
+        JSONObject user = userService.authorize(jwt_token);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        int UID=user.getInt("uid");
+
+        int statusCode = userService.addSongToPlaylist(jwt_token,UID,playlistId,songId);
+        if(statusCode!=-1){
+            return new ResponseEntity<>(HttpStatus.valueOf(statusCode));
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
 }
 

@@ -60,7 +60,7 @@ function GetPlaylist() {
 
                             < div className="container d-flex flex-row mb-3 song p-4 bg-dark" >
 
-                                <div class="col-6">{playlist.id}</div>
+                                <a href={"/playlists/" + playlist.id} class="col-6">{playlist.id}</a>
                                 <div class="col-6">{playlist.title}</div>
 
 
