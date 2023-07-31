@@ -1,5 +1,7 @@
 # Spotify Web Application
 
-This is an Web-Application implemented as a project for "Services-Oriented Progamming" class.
-The Application contains multiple web-services that uses REST architecture and SOAP protocol for communication.
-The application allows the users to perform CRUD operations on tabels/collections like artists, songs, users and playlist.
+This is a web application implemented as a project for the "Services-Oriented Programming" class. The application contains multiple web services that use the REST architecture and SOAP protocol for communication. The application allows users to perform CRUD operations on tables/collections such as artists, songs, users, and playlists.
+
+
+
+
